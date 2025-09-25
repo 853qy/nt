@@ -164,7 +164,7 @@ cdef class SubscribeData(DataCommand):
         self,
         datetime start: datetime | None,
         datetime end: datetime | None,
-        callback not None: Callable[[Any], None],
+        callback: Callable[[Any], None] | None,
     ) -> RequestData:
         """
         Convert this subscribe message to a request message.
@@ -267,7 +267,7 @@ cdef class SubscribeInstruments(SubscribeData):
         self,
         datetime start: datetime | None,
         datetime end: datetime | None,
-        callback not None: Callable[[Any], None],
+        callback: Callable[[Any], None] | None,
     ) -> RequestInstruments:
         """
         Convert this subscribe message to a request message.
@@ -473,7 +473,7 @@ cdef class SubscribeOrderBook(SubscribeData):
         self,
         datetime start: datetime | None,
         datetime end: datetime | None,
-        callback not None: Callable[[Any], None],
+        callback: Callable[[Any], None] | None,
     ) -> RequestOrderBookDepth:
         """
         Convert this subscribe message to a request message.
@@ -587,7 +587,7 @@ cdef class SubscribeQuoteTicks(SubscribeData):
         self,
         datetime start: datetime | None,
         datetime end: datetime | None,
-        callback not None: Callable[[Any], None],
+        callback: Callable[[Any], None] | None,
     ) -> RequestQuoteTicks:
         """
         Convert this subscribe message to a request message.
@@ -694,7 +694,7 @@ cdef class SubscribeTradeTicks(SubscribeData):
         self,
         datetime start: datetime | None,
         datetime end: datetime | None,
-        callback not None: Callable[[Any], None],
+        callback: Callable[[Any], None] | None,
     ) -> RequestTradeTicks:
         """
         Convert this subscribe message to a request message.
@@ -1006,7 +1006,7 @@ cdef class SubscribeBars(SubscribeData):
         self,
         datetime start: datetime | None,
         datetime end: datetime | None,
-        callback not None: Callable[[Any], None],
+        callback: Callable[[Any], None] | None,
     ) -> RequestBars:
         """
         Convert this subscribe message to a request message.
@@ -2010,7 +2010,7 @@ cdef class RequestData(Request):
         int limit,
         ClientId client_id: ClientId | None,
         Venue venue: Venue | None,
-        callback not None: Callable[[Any], None],
+        callback: Callable[[Any], None] | None,
         UUID4 request_id not None,
         uint64_t ts_init,
         dict[str, object] params: dict | None,
@@ -2032,7 +2032,7 @@ cdef class RequestData(Request):
         self.venue = venue
         self.params = params or {}
 
-    def with_dates(self, datetime start, datetime end, uint64_t ts_init):
+    def with_dates(self, datetime start, datetime end, uint64_t ts_init, callback: Callable[[Any], None] | None = None):
         return RequestData(
             data_type=self.data_type,
             instrument_id=self.instrument_id,
@@ -2041,7 +2041,7 @@ cdef class RequestData(Request):
             limit=self.limit,
             client_id=self.client_id,
             venue=self.venue,
-            callback=self.callback,
+            callback=callback,
             request_id=UUID4(),
             ts_init=ts_init,
             params=self.params.copy(),
@@ -2116,7 +2116,7 @@ cdef class RequestInstrument(RequestData):
         datetime end : datetime | None,
         ClientId client_id: ClientId | None,
         Venue venue: Venue | None,
-        callback not None: Callable[[Any], None],
+        callback: Callable[[Any], None] | None,
         UUID4 request_id not None,
         uint64_t ts_init,
         dict[str, object] params: dict | None,
@@ -2199,7 +2199,7 @@ cdef class RequestInstruments(RequestData):
         datetime end : datetime | None,
         ClientId client_id: ClientId | None,
         Venue venue: Venue | None,
-        callback not None: Callable[[Any], None],
+        callback: Callable[[Any], None] | None,
         UUID4 request_id not None,
         uint64_t ts_init,
         dict[str, object] params: dict | None,
@@ -2220,13 +2220,13 @@ cdef class RequestInstruments(RequestData):
             correlation_id,
         )
 
-    def with_dates(self, datetime start, datetime end, uint64_t ts_init):
+    def with_dates(self, datetime start, datetime end, uint64_t ts_init, callback: Callable[[Any], None] | None = None):
         return RequestInstruments(
             start=start,
             end=end,
             client_id=self.client_id,
             venue=self.venue,
-            callback=self.callback,
+            callback=callback,
             request_id=UUID4(),
             ts_init=ts_init,
             params=self.params.copy(),
@@ -2292,7 +2292,7 @@ cdef class RequestOrderBookSnapshot(RequestData):
         int limit,
         ClientId client_id: ClientId | None,
         Venue venue: Venue | None,
-        callback not None: Callable[[Any], None],
+        callback: Callable[[Any], None] | None,
         UUID4 request_id not None,
         uint64_t ts_init,
         dict[str, object] params: dict | None,
@@ -2382,7 +2382,7 @@ cdef class RequestOrderBookDepth(RequestData):
         int depth,
         ClientId client_id: ClientId | None,
         Venue venue: Venue | None,
-        callback not None: Callable[[Any], None],
+        callback: Callable[[Any], None] | None,
         UUID4 request_id not None,
         uint64_t ts_init,
         dict[str, object] params: dict | None,
@@ -2404,7 +2404,7 @@ cdef class RequestOrderBookDepth(RequestData):
         )
         self.depth = depth
 
-    def with_dates(self, datetime start, datetime end, uint64_t ts_init):
+    def with_dates(self, datetime start, datetime end, uint64_t ts_init, callback: Callable[[Any], None] | None = None):
         return RequestOrderBookDepth(
             instrument_id=self.instrument_id,
             start=start,
@@ -2413,7 +2413,7 @@ cdef class RequestOrderBookDepth(RequestData):
             depth=self.depth,
             client_id=self.client_id,
             venue=self.venue,
-            callback=self.callback,
+            callback=callback,
             request_id=UUID4(),
             ts_init=ts_init,
             params=self.params.copy(),
@@ -2492,7 +2492,7 @@ cdef class RequestQuoteTicks(RequestData):
         int limit,
         ClientId client_id: ClientId | None,
         Venue venue: Venue | None,
-        callback not None: Callable[[Any], None],
+        callback: Callable[[Any], None] | None,
         UUID4 request_id not None,
         uint64_t ts_init,
         dict[str, object] params: dict | None,
@@ -2513,7 +2513,7 @@ cdef class RequestQuoteTicks(RequestData):
             correlation_id,
         )
 
-    def with_dates(self, datetime start, datetime end, uint64_t ts_init):
+    def with_dates(self, datetime start, datetime end, uint64_t ts_init, callback: Callable[[Any], None] | None = None):
         return RequestQuoteTicks(
             instrument_id=self.instrument_id,
             start=start,
@@ -2521,7 +2521,7 @@ cdef class RequestQuoteTicks(RequestData):
             limit=self.limit,
             client_id=self.client_id,
             venue=self.venue,
-            callback=self.callback,
+            callback=callback,
             request_id=UUID4(),
             ts_init=ts_init,
             params=self.params.copy(),
@@ -2597,7 +2597,7 @@ cdef class RequestTradeTicks(RequestData):
         int limit,
         ClientId client_id: ClientId | None,
         Venue venue: Venue | None,
-        callback not None: Callable[[Any], None],
+        callback: Callable[[Any], None] | None,
         UUID4 request_id not None,
         uint64_t ts_init,
         dict[str, object] params: dict | None,
@@ -2618,7 +2618,7 @@ cdef class RequestTradeTicks(RequestData):
             correlation_id,
         )
 
-    def with_dates(self, datetime start, datetime end, uint64_t ts_init):
+    def with_dates(self, datetime start, datetime end, uint64_t ts_init, callback: Callable[[Any], None] | None = None):
         return RequestTradeTicks(
             instrument_id=self.instrument_id,
             start=start,
@@ -2626,7 +2626,7 @@ cdef class RequestTradeTicks(RequestData):
             limit=self.limit,
             client_id=self.client_id,
             venue=self.venue,
-            callback=self.callback,
+            callback=callback,
             request_id=UUID4(),
             ts_init=ts_init,
             params=self.params.copy(),
@@ -2703,7 +2703,7 @@ cdef class RequestBars(RequestData):
         int limit,
         ClientId client_id: ClientId | None,
         Venue venue: Venue | None,
-        callback not None: Callable[[Any], None],
+        callback: Callable[[Any], None] | None,
         UUID4 request_id not None,
         uint64_t ts_init,
         dict[str, object] params: dict | None,
@@ -2725,7 +2725,7 @@ cdef class RequestBars(RequestData):
         )
         self.bar_type = bar_type
 
-    def with_dates(self, datetime start, datetime end, uint64_t ts_init):
+    def with_dates(self, datetime start, datetime end, uint64_t ts_init, callback: Callable[[Any], None] | None = None):
         return RequestBars(
             bar_type=self.bar_type,
             start=start,
@@ -2733,7 +2733,7 @@ cdef class RequestBars(RequestData):
             limit=self.limit,
             client_id=self.client_id,
             venue=self.venue,
-            callback=self.callback,
+            callback=callback,
             request_id=UUID4(),
             ts_init=ts_init,
             params=self.params.copy(),
